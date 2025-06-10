@@ -1,8 +1,8 @@
----
+<!-- ---
 title: Customize the Favicon
 author: cotes
 date: 2019-08-11 00:34:00 +0800
-categories: [Blogging, Tutorial]
+categories: [Blogging, Tech-Concepts]
 tags: [favicon]
 ---
 
@@ -31,7 +31,7 @@ The following table will help you understand the changes to the favicon files:
 | `*.ICO`             | ✓                                 | ✗           |
 
 <!-- markdownlint-disable-next-line -->
->  ✓ means keep, ✗ means delete.
+<!-- >  ✓ means keep, ✗ means delete.
 {: .prompt-info }
 
-The next time you build the site, the favicon will be replaced with a customized edition.
+The next time you build the site, the favicon will be replaced with a customized edition. --> -->

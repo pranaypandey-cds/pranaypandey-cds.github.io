@@ -1,11 +1,11 @@
----
+<!-- ---
 title: Getting Started
 description: >-
   Get started with Chirpy basics in this comprehensive overview.
   You will learn how to install, configure, and use your first Chirpy-based website, as well as deploy it to a web server.
 author: cotes
 date: 2019-08-09 20:55:00 +0800
-categories: [Blogging, Tutorial]
+categories: [Blogging, Tech-Concepts]
 tags: [getting started]
 pin: true
 media_subpath: '/posts/20180809'
@@ -146,4 +146,4 @@ Unless you specified the output path, the generated site files will be placed in
 [vscode]: https://code.visualstudio.com/
 [dev-containers]: https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers
 [dc-clone-in-vol]: https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-a-git-repository-or-github-pr-in-an-isolated-container-volume
-[dc-open-in-container]: https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container
+[dc-open-in-container]: https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container -->

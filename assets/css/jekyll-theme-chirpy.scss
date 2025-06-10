@@ -1,11 +1,108 @@
 ---
 ---
 
-/* prettier-ignore */
-@use 'main
-{%- if jekyll.environment == 'production' -%}
-  .bundle
-{%- endif -%}
-';
+@use "main";
 
-/* append your custom style below */
+/* Timeline styles */
+.timeline {
+  position: relative;
+  margin: 2rem 0;
+  padding-left: 0; /* remove padding, handled by timeline-list */
+  /* REMOVE border-left from here */
+  /* border-left: 3px solid #007bff; */
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 2rem;
+  /* Animation */
+  opacity: 0;
+  animation-name: fadeSlideUp;
+  animation-duration: 0.6s;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease-out;
+  animation-delay: var(--delay, 0s);
+}
+
+// .timeline-item::before {
+//   content: "";
+//   position: absolute;
+//   left: -10px;
+//   top: 0;
+//   width: 16px;
+//   height: 16px;
+//   background-color: #007bff;
+//   border-radius: 50%;
+//   border: 3px solid white;
+//   box-shadow: 0 0 0 2px #007bff;
+// }
+
+.timeline-date {
+  position: absolute;
+  left: -60px;
+  top: 5px; /* add some vertical offset */
+  width: 50px;
+  font-weight: 600;
+  color: #007bff;
+  text-align: right;
+  user-select: none;
+}
+
+.timeline-content p {
+  margin: 0.3rem 0;
+  color: #333;
+  font-size: 1rem;
+}
+.timeline-list {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding-left: 80px; /* Leave enough space for date + bullet */
+  border-left: 3px solid #007bff; /* vertical line on left */
+}
+
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -15px; /* bullet on vertical line */
+  top: 10px; /* align bullet with date text */
+  width: 12px;
+  height: 12px;
+  background-color: #6c757d;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px #6c757d;
+}
+.timeline-content {
+  color: #333;
+  font-size: 1rem;
+}
+
+
+
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+  .timeline {
+    padding-left: 15px;
+  }
+
+  .timeline-item::before {
+    left: -12px;
+  }
+
+  .timeline-content {
+    font-size: 0.95rem;
+  }
+}

@@ -5,6 +5,46 @@ refactor: true
 
 {% include lang.html %}
 
+<div class="card-body">
+  <h1 class="card-title">👋 Hi, I’m Pranay</h1>
+  <p class="card-text mt-2">
+    I’m a data scientist with a strong background in machine learning, deep learning, and graph neural networks. I love exploring the boundaries of intelligent systems and sharing what I learn through projects and blog posts.
+  </p>
+  <p>
+    This portfolio showcases my thoughts, work, and interests. Stick around to check out my latest projects and articles!
+  </p>
+</div>
+
+<div id="archives">
+<h2 class="memoriae-title mb-1">Memoriae Timeline</h2>
+<p class="text-muted mt-0">A walk through the memories that shaped me</p>
+
+  <time class="year">2023</time>
+  <ul>
+    <li><a href="#">Started my journey at Axtria as a Data Scientist</a></li>
+    <li><a href="#">Graduated with an M.Tech in Computational & Data Sciences from IISc Bangalore</a></li>
+  </ul>
+
+  <time class="year">2021</time>
+  <ul>
+    <li><a href="#">Began M.Tech at the CDS department, IISc Bangalore</a></li>
+    <li><a href="#">Cracked GATE with AIR 157 and joined IISc Bangalore</a></li>
+  </ul>
+
+  <time class="year">2019</time>
+  <ul>
+    <li><a href="#">Joined Escorts Ltd. as a Graduate Engineer Trainee</a></li>
+    <li><a href="#">Graduated with a B.Tech in Mechanical Engineering from GBPUAT</a></li>
+  </ul>
+
+  <time class="year">2015</time>
+  <ul>
+   <li><a href="#">Embarked on my engineering journey at GBPUAT, majoring in Mechanical Engineering</a></li>
+  </ul>
+</div>
+
+
+
 {% assign all_pinned = site.posts | where: 'pin', 'true' %}
 {% assign all_normal = site.posts | where_exp: 'item', 'item.pin != true and item.hidden != true' %}
 
