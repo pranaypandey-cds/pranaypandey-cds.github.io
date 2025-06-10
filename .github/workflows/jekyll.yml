@@ -9,7 +9,7 @@ name: Deploy Jekyll site to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
+    branches: ["main"] # Ensure this matches your default branch, e.g., 'master' or 'main'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -33,21 +33,47 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true # Important for Chirpy themes that use Git submodules
+          fetch-depth: 0 # Fetches full history, sometimes needed for Jekyll plugins
+
       - name: Setup Ruby
         # https://github.com/ruby/setup-ruby/releases/tag/v1.207.0
         uses: ruby/setup-ruby@4a9ddd6f338a97768b8006bf671dfbad383215f4
         with:
-          ruby-version: '3.1' # Not needed with a .ruby-version file
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          ruby-version: '3.1' # Keep this as your preferred Ruby version
+          bundler-cache: true # Runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
+
+      ---
+
+      # --- START OF NODE.JS BUILD STEPS (CRUCIAL FOR CHIRPY THEME) ---
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # IMPORTANT: Set this to the Node.js version you use in Codespaces (e.g., '18', '20', '22')
+          cache: 'npm' # This caches Node.js dependencies for faster builds
+
+      - name: Install Node.js dependencies
+        run: npm install # This command reads your 'package-lock.json' to install exact package versions
+
+      - name: Build JS and CSS assets
+        run: npm run build # This executes the 'build' script from your package.json, generating minified assets
+      # --- END OF NODE.JS BUILD STEPS ---
+
+      ---
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
+
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
-          JEKYLL_ENV: production
+          JEKYLL_ENV: production # Ensures Jekyll builds in production mode
+          # Add any other environment variables specific to Chirpy's Jekyll build if needed
+
       - name: Upload artifact
         # Automatically uploads an artifact from the './_site' directory by default
         uses: actions/upload-pages-artifact@v3
