@@ -45,7 +45,7 @@ jobs:
           bundler-cache: true # Runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
 
-      ---
+      #---
 
       # --- START OF NODE.JS BUILD STEPS (CRUCIAL FOR CHIRPY THEME) ---
       - name: Setup Node.js
@@ -61,7 +61,7 @@ jobs:
         run: npm run build # This executes the 'build' script from your package.json, generating minified assets
       # --- END OF NODE.JS BUILD STEPS ---
 
-      ---
+      #---
 
       - name: Setup Pages
         id: pages
