@@ -4,19 +4,14 @@ description: Mathematics and Logic Behind the Scale
 author: pranay
 date: 2025-03-11
 categories: [Blogging,Foundation]
-tags: [BERT, Recommendation]
+tags: [Transformer, Attention]
 comments: false
 math: true
 mermaid: false
 ---
 
-## Why Scale the Scaled Dot-Product Attention?
-{: .mt-4 .mb-0 }
 
-## The Mathematics and Logic Behind the Scale
-{: .mt-4 .mb-0 }
-
-The groundbreaking paper *"Attention Is All You Need"* (2017) introduced the **Transformer architecture**, marking a major breakthrough in the field of language modeling.
+The groundbreaking paper *"Attention Is All You Need"*[^Paper] (2017) introduced the **Transformer architecture**, marking a major breakthrough in the field of language modeling.
 
 Among the many innovations in that paper, the **Scaled Dot-Product Attention** mechanism stood out as a core component of the Transformer. Here's what it looks like mathematically:
 
@@ -33,7 +28,7 @@ Unlike many hyperparameters in deep learning that are often tuned through trial 
 
 The paper states:
 
-> “We suspect that for large values of $d_k$, the dot products grow large in magnitude, pushing the softmax function into regions where it has extremely small gradients. To counteract this effect, we scale the dot products by $\sqrt{d_k}$.”
+> “We suspect that for large values of $d_k$, the dot products grow large in magnitude, pushing the softmax function into regions where it has extremely small gradients. To counteract this effect, we scale the dot products by $\sqrt{d_k}$”
 
 Let’s dive deeper into this.
 
@@ -49,3 +44,5 @@ Now, when we compute gradients during backpropagation, we rely on the derivative
 In highly skewed distributions, most $s_i$ values are close to 0, so their derivatives become **very small**.
 
 This leads to **vanishing gradients**, meaning the model’s parameters update very little (or not at all). As a result, **learning slows down dramatically or fails altogether**.
+
+[^Paper]: https://arxiv.org/pdf/1706.03762 "Attention Is All You Need"
