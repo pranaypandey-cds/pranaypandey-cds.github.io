@@ -9,6 +9,9 @@ comments: false
 math: true
 mermaid: false
 ---
+![Scaled Attention with Sherlock Holmes](/assets/img/why_scale_the_scaled_attention.png){: width="800" }
+_Figure: Created with GPT._
+
 ## Overview
 
 The groundbreaking paper *"Attention Is All You Need"*[^Paper] (2017) introduced the **Transformer architecture**, marking a major breakthrough in the field of language modeling.
