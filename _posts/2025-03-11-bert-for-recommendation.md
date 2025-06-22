@@ -1,5 +1,5 @@
 ---
-title: BERT for Recommendation - BERT4Rec & Hybrid BERT4Rec
+title: BERT for Recommendation - BERT4Rec
 description: Exploring how transformer-based models are advancing sequential recommendation systems.
 author: pranay
 date: 2025-03-11
@@ -9,192 +9,74 @@ comments: false
 math: true
 mermaid: true
 # image:
-#   path: /commons/devices-mockup.png
+#   path: /assests/img/BERT4Rec.PNG
 #   lqip: data:image/webp;base64,UklGRpoAAABXRUJQVlA4WAoAAAAQAAAADwAABwAAQUxQSDIAAAARL0AmbZurmr57yyIiqE8oiG0bejIYEQTgqiDA9vqnsUSI6H+oAERp2HZ65qP/VIAWAFZQOCBCAAAA8AEAnQEqEAAIAAVAfCWkAALp8sF8rgRgAP7o9FDvMCkMde9PK7euH5M1m6VWoDXf2FkP3BqV0ZYbO6NA/VFIAAAA
 #   alt: Responsive rendering of Chirpy theme on multiple devices.
 ---
+![Transformers for Recommendation](/assets/img/bert4rec.png){: width="800" }
+_Figure: Created with GPT._
 
-## Headings
 
-<!-- markdownlint-capture -->
-<!-- markdownlint-disable -->
-# H1 — heading
-{: .mt-4 .mb-0 }
+## Introduction
 
-## H2 — heading
-{: data-toc-skip='' .mt-4 .mb-0 }
+Recommendation engines are at the heart of many e-commerce and content platforms. Building an effective recommendation system requires understanding the dynamic behavior of users. Sequential recommender systems aim to:
 
-### H3 — heading
-{: data-toc-skip='' .mt-4 .mb-0 }
+- Understand what a user generally likes (based on past behavior), and  
+- Adapt recommendations based on their recent activity — thereby handling the dynamic nature of preferences.
 
-#### H4 — heading
-{: data-toc-skip='' .mt-4 }
-<!-- markdownlint-restore -->
+**Example:** Joey usually watches light-hearted movies, but recently he watched *Die Hard*. Recommending *Die Hard 2* next is a good decision, showing why the **sequence** of user interactions matters.
 
-## Paragraph
+Various approaches have been proposed for sequential recommendation prior to this paper — including **Markov Chains (MCs), RNNs, GRUs, LSTMs**, and deep learning models like **CNNs** and even **Transformer Decoders**. Most of these follow a similar paradigm: they encode a user’s historical interactions **left-to-right** into a hidden representation and use that for making recommendations.
 
-Quisque egestas convallis ipsum, ut sollicitudin risus tincidunt a. Maecenas interdum malesuada egestas. Duis consectetur porta risus, sit amet vulputate urna facilisis ac. Phasellus semper dui non purus ultrices sodales. Aliquam ante lorem, ornare a feugiat ac, finibus nec mauris. Vivamus ut tristique nisi. Sed vel leo vulputate, efficitur risus non, posuere mi. Nullam tincidunt bibendum rutrum. Proin commodo ornare sapien. Vivamus interdum diam sed sapien blandit, sit amet aliquam risus mattis. Nullam arcu turpis, mollis quis laoreet at, placerat id nibh. Suspendisse venenatis eros eros.
+**BERT4Rec**[^1] differs by using **BERT**[^2], a bidirectional model. Its bidirectional nature brings two key advantages:
 
-## Lists
+- It enhances the hidden representation of items in a user’s sequence by encoding from both directions, unlike left-to-right models.
+- It avoids the assumption of strictly ordered sequences, which isn’t always practical in real-world data.
 
-### Ordered list
+## Model
 
-1. Firstly
-2. Secondly
-3. Thirdly
+The model tackles the classic sequential recommendation task:  
+Given Joey’s viewing history, predict the next movie he’s likely to enjoy.
 
-### Unordered list
+**BERT** is used to extract hidden representations of items in the user's list.
 
-- Chapter
-  - Section
-    - Paragraph
+## Model Training
 
-### ToDo list
+One key innovation in this paper is the **training objective**. Traditional sequential models are trained to **predict the next item at each step** in the input sequence. However, this approach doesn't suit a **bidirectional model**, since conditioning jointly from both directions would let items indirectly "see" the target item — defeating the purpose.
 
-- [ ] Job
-  - [x] Step 1
-  - [x] Step 2
-  - [ ] Step 3
+Instead, the paper uses the **Cloze task objective** (aka **Masked Language Model**). Just like BERT's original training setup, some items in the user's interaction sequence are randomly **masked**, and the model is trained to predict them using **both left and right context**.
 
-### Description list
+In some cases, the **last item** is specifically masked (explained later).  
+The masked item is replaced with a `<mask>` token. Its hidden representation is passed through a softmax layer over the entire item set to get a distribution.
 
-Sun
-: the star around which the earth orbits
+The **loss function** used is **negative log likelihood**.
 
-Moon
-: the natural satellite of the earth, visible by reflected light from the sun
+An advantage of this Cloze task is that it generates **more training samples**:  
+If the sequence length is `n` and we mask `k` items, we get `nCk` possible samples.  
+In contrast, next-item prediction can only create up to `t-1` samples (for a sequence of length `t`).
 
-## Block Quote
+## Model Inference
 
-> This line shows the _block quote_.
+The final goal is to **predict the next item**, but the Cloze task predicts masked items in general. To bridge this mismatch, the model adds a `<mask>` token at the **end** of the user's item sequence during inference. The prediction is then made based on the **final hidden representation** of that `<mask>` token.
 
-## Prompts
+## Evaluation
 
-<!-- markdownlint-capture -->
-<!-- markdownlint-disable -->
-> An example showing the `tip` type prompt.
-{: .prompt-tip }
+For evaluation:
 
-> An example showing the `info` type prompt.
-{: .prompt-info }
+- The full sequence is used for training, **excluding the last two items**.
+- The **second last** item is used for **validation**.
+- The **last** item is used for **testing**.
 
-> An example showing the `warning` type prompt.
-{: .prompt-warning }
+To evaluate the model:
 
-> An example showing the `danger` type prompt.
-{: .prompt-danger }
-<!-- markdownlint-restore -->
+- **100 negative samples** are randomly selected and combined with the correct next item.
+- The model must rank all items, and the performance is measured using:
 
-## Tables
+  - **Hit Ratio**
+  - **NDCG**
+  - **MRR**
 
-| Company                      | Contact          | Country |
-| :--------------------------- | :--------------- | ------: |
-| Alfreds Futterkiste          | Maria Anders     | Germany |
-| Island Trading               | Helen Bennett    |      UK |
-| Magazzini Alimentari Riuniti | Giovanni Rovelli |   Italy |
+## References
 
-## Links
-
-<http://127.0.0.1:4000>
-
-## Footnote
-
-Click the hook will locate the footnote[^footnote], and here is another footnote[^fn-nth-2].
-
-## Inline code
-
-This is an example of `Inline Code`.
-
-## Filepath
-
-Here is the `/path/to/the/file.extend`{: .filepath}.
-
-## Code blocks
-
-### Common
-
-```text
-This is a common code snippet, without syntax highlight and line number.
-```
-
-### Specific Language
-
-```bash
-if [ $? -ne 0 ]; then
-  echo "The command was not successful.";
-  #do the needful / exit
-fi;
-```
-
-### Specific filename
-
-```sass
-@import
-  "colors/light-typography",
-  "colors/dark-typography";
-```
-{: file='_sass/jekyll-theme-chirpy.scss'}
-
-## Mathematics
-
-The mathematics powered by [**MathJax**](https://www.mathjax.org/):
-
-$$
-\begin{equation}
-  \sum_{n=1}^\infty 1/n^2 = \frac{\pi^2}{6}
-  \label{eq:series}
-\end{equation}
-$$
-
-We can reference the equation as \eqref{eq:series}.
-
-When $a \ne 0$, there are two solutions to $ax^2 + bx + c = 0$ and they are
-
-$$ x = {-b \pm \sqrt{b^2-4ac} \over 2a} $$
-
-## Mermaid SVG
-
-```mermaid
- gantt
-  title  Adding GANTT diagram functionality to mermaid
-  apple :a, 2017-07-20, 1w
-  banana :crit, b, 2017-07-23, 1d
-  cherry :active, c, after b a, 1d
-```
-
-## Images
-
-### Default (with caption)
-
-![Desktop View](/posts/20190808/mockup.png){: width="972" height="589" }
-_Full screen width and center alignment_
-
-### Left aligned
-
-![Desktop View](/posts/20190808/mockup.png){: width="972" height="589" .w-75 .normal}
-
-### Float to left
-
-![Desktop View](/posts/20190808/mockup.png){: width="972" height="589" .w-50 .left}
-Praesent maximus aliquam sapien. Sed vel neque in dolor pulvinar auctor. Maecenas pharetra, sem sit amet interdum posuere, tellus lacus eleifend magna, ac lobortis felis ipsum id sapien. Proin ornare rutrum metus, ac convallis diam volutpat sit amet. Phasellus volutpat, elit sit amet tincidunt mollis, felis mi scelerisque mauris, ut facilisis leo magna accumsan sapien. In rutrum vehicula nisl eget tempor. Nullam maximus ullamcorper libero non maximus. Integer ultricies velit id convallis varius. Praesent eu nisl eu urna finibus ultrices id nec ex. Mauris ac mattis quam. Fusce aliquam est nec sapien bibendum, vitae malesuada ligula condimentum.
-
-### Float to right
-
-![Desktop View](/posts/20190808/mockup.png){: width="972" height="589" .w-50 .right}
-Praesent maximus aliquam sapien. Sed vel neque in dolor pulvinar auctor. Maecenas pharetra, sem sit amet interdum posuere, tellus lacus eleifend magna, ac lobortis felis ipsum id sapien. Proin ornare rutrum metus, ac convallis diam volutpat sit amet. Phasellus volutpat, elit sit amet tincidunt mollis, felis mi scelerisque mauris, ut facilisis leo magna accumsan sapien. In rutrum vehicula nisl eget tempor. Nullam maximus ullamcorper libero non maximus. Integer ultricies velit id convallis varius. Praesent eu nisl eu urna finibus ultrices id nec ex. Mauris ac mattis quam. Fusce aliquam est nec sapien bibendum, vitae malesuada ligula condimentum.
-
-### Dark/Light mode & Shadow
-
-The image below will toggle dark/light mode based on theme preference, notice it has shadows.
-
-![light mode only](/posts/20190808/devtools-light.png){: .light .w-75 .shadow .rounded-10 w='1212' h='668' }
-![dark mode only](/posts/20190808/devtools-dark.png){: .dark .w-75 .shadow .rounded-10 w='1212' h='668' }
-
-## Video
-
-{% include embed/youtube.html id='Balreaj8Yqs' %}
-
-## Reverse Footnote
-
-[^footnote]: The footnote source
-[^fn-nth-2]: The 2nd footnote source
+[^1]:["BERT4Rec: Sequential Recommendation with Bidirectional Encoder Representations from Transformer"](https://arxiv.org/pdf/1904.06690)
+[^2]:["BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding"](https://arxiv.org/pdf/1810.04805)
