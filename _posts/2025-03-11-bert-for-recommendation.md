@@ -76,6 +76,59 @@ To evaluate the model:
   - **NDCG**
   - **MRR**
 
+In recommendation systems, metrics are calculated a bit differently compared to traditional classification problems.
+
+Let’s say Joey has a list of movies he wants to watch — for example: `[Rambo, Fight Club]`. This list is the **ground truth**. The model assigns scores to all **unwatched movies**, and based on those scores (e.g., from predicted probabilities or log-likelihood), it generates a **ranked list**.
+
+We don't evaluate performance over all unwatched movies. Instead, we take the **top-K** movies from the ranked list and calculate the metrics based on this subset.
+
+> 🧠 **K** can be considered as the size of the app’s recommendation block (e.g., top 5 or top 10).
+
+We also follow the **leave-one-out evaluation strategy**:
+- The **last interaction** is used for **testing**
+- The **second-last** is for **validation**
+- The rest are used for **training**
+
+---
+
+#### 📌 Recall@K
+
+Recall in classification is defined as:  
+**TP / (TP + FN)** — i.e., out of all actual positives, how many were correctly predicted.
+
+In recommendation terms, **Recall@K** means:
+> Out of the actual ground truth items, how many appeared in the top-K predicted items.
+
+---
+
+#### 📌 Hit Ratio@K
+
+**Hit Ratio@K** is:
+> `1` if **any** of the ground truth items appears in the top-K list, otherwise `0`.
+
+In our setup — where the ground truth has only **1 item** — **Hit Ratio** is effectively the same as **Recall**, because the denominator in Recall is 1.
+
+---
+
+#### 📌 Normalized Discounted Cumulative Gain (NDCG@K)
+
+**NDCG** accounts not only for whether the ground truth item appears, but also **where** it appears in the top-K list. It rewards higher placement (top of the list) more than lower placement.
+
+It compares the actual ranked list to an **ideal ranking**, where all relevant items are at the top.
+
+- **DCG (Discounted Cumulative Gain)**: Measures relevance, penalizing lower-ranked relevant items using a logarithmic discount.
+- **IDCG (Ideal DCG)**: The best possible DCG for that user — i.e., if all relevant items were ranked perfectly.
+
+> **NDCG = DCG / IDCG**
+
+This gives a normalized score between `0` and `1`:
+- `1` → perfect ranking
+- `0` → worst ranking
+
+Because we use binary relevance (an item is either relevant or not), and since different users may have different numbers of relevant items, NDCG provides a consistent way to compare ranking quality across users.
+
+---
+
 ## References
 
 [^1]:["BERT4Rec: Sequential Recommendation with Bidirectional Encoder Representations from Transformer"](https://arxiv.org/pdf/1904.06690)
