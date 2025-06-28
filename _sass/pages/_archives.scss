@@ -116,8 +116,7 @@
     ul li {
       padding-left: calc(4rem + 1.5rem);
 
-      &::before {git
-        // left is now handled via var()
+      &::before {        // left is now handled via var()
       }
     }
   }
