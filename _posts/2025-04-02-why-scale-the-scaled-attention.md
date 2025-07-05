@@ -2,7 +2,7 @@
 title: Why scale the Scaled Dot-Product Attention?
 description: Mathematics and Logic Behind the Scale
 author: pranay
-date: 2025-03-11
+date: 2025-06-08
 categories: [Blogging,Foundation]
 tags: [Transformer, Attention]
 comments: false

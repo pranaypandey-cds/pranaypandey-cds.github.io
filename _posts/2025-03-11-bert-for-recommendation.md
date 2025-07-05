@@ -2,7 +2,7 @@
 title: BERT for Recommendation - BERT4Rec
 description: Exploring how transformer-based models are advancing sequential recommendation systems.
 author: pranay
-date: 2025-03-11
+date: 2025-06-29
 categories: [Blogging, Papers]
 tags: [BERT, Recommendation]
 comments: false
@@ -82,7 +82,7 @@ Let’s say Joey has a list of movies he wants to watch — for example: `[Rambo
 
 We don't evaluate performance over all unwatched movies. Instead, we take the **top-K** movies from the ranked list and calculate the metrics based on this subset.
 
-> 🧠 **K** can be considered as the size of the app’s recommendation block (e.g., top 5 or top 10).
+> **K** can be considered as the size of the app’s recommendation block (e.g., top 5 or top 10).
 
 We also follow the **leave-one-out evaluation strategy**:
 - The **last interaction** is used for **testing**
@@ -91,7 +91,7 @@ We also follow the **leave-one-out evaluation strategy**:
 
 ---
 
-#### 📌 Recall@K
+####  Recall@K
 
 Recall in classification is defined as:  
 **TP / (TP + FN)** — i.e., out of all actual positives, how many were correctly predicted.
@@ -101,7 +101,7 @@ In recommendation terms, **Recall@K** means:
 
 ---
 
-#### 📌 Hit Ratio@K
+####  Hit Ratio@K
 
 **Hit Ratio@K** is:
 > `1` if **any** of the ground truth items appears in the top-K list, otherwise `0`.
@@ -110,7 +110,7 @@ In our setup — where the ground truth has only **1 item** — **Hit Ratio** is
 
 ---
 
-#### 📌 Normalized Discounted Cumulative Gain (NDCG@K)
+####  Normalized Discounted Cumulative Gain (NDCG@K)
 
 **NDCG** accounts not only for whether the ground truth item appears, but also **where** it appears in the top-K list. It rewards higher placement (top of the list) more than lower placement.
 
