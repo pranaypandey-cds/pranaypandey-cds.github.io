@@ -22,9 +22,7 @@ $$
 \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
 $$
 
-The term **"scaled"** in this equation isn’t just a fancy name—it comes with solid mathematical reasoning.
-
-Unlike many hyperparameters in deep learning that are often tuned through trial and error or heuristics (rules of thumb), the scaling factor $\sqrt{d_k}$ has a theoretical motivation.
+The term **"scaled"** in this equation isn’t just a fancy name—it comes with solid mathematical reasoning. Unlike many hyperparameters in deep learning that are often tuned through trial and error or heuristics, the scaling factor $\sqrt{d_k}$ has a theoretical motivation.
 
 ## Logic
 
@@ -44,7 +42,7 @@ $$
 \text{Var}(q \cdot k) = \text{Var}\left(\sum_{i=1}^{d_k} q_i k_i\right)
 $$
 
-Each $\( q_i \)$ and $\( k_i \)$ are **independent**, with $\( \mathbb{E}[q_i] = \mathbb{E}[k_i] = 0 \)$ and $\( \text{Var}(q_i) = \text{Var}(k_i) = 1 \)$. So each pair $\(q_i \cdot k_i\)$ is also independent.
+Each $q_i$ and $k_i$ are independent, with $\( \mathbb{E}[q_i] = \mathbb{E}[k_i] = 0 \)$ and $\( \text{Var}(q_i) = \text{Var}(k_i) = 1 \)$. So each pair $\(q_i \cdot k_i\)$ is also independent.
 
 Therefore:
 
@@ -70,33 +68,118 @@ As $d_k$ increases, the variance of the dot product grows—roughly scaling as $
 This can be understood with a simple example:
 
 Suppose we have the vector:
-
 $$
-[y=0.2,\ 0.4,\ 0.1,\ 0.8]
-$$
-
-Applying softmax to this would produce moderately spread probabilities. But now, consider multiplying the vector by 8:
-
-$$
-y=[1.6,\ 3.2,\ 0.8,\ 6.4]
+y=[0.2,\ 0.4,\ 0.1,\ 0.8]
 $$
 
-Since variance scales with the **square of the scaling factor**, the new vector has $\( 8^2 = 64 \)$ times the original variance.
+```py
+import numpy as np
 
-Now, applying softmax to this scaled vector would result in something like:
+def softmax(vec):
+    exp_arr=np.exp(vec)
+    return exp_arr/np.sum(exp_arr)
+
+y = np.array([0.2, 0.4, 0.1, 0.8])
+s = softmax(y)
+print(f"Softmax of y: {np.round(s, 3)}")
+```
+
+Output:
+
+```text
+Softmax of y: [0.202 0.247 0.183 0.368]
+```
+
+This produced a moderately spread probabilities. But now, consider multiplying the vector by 8:
+$$
+y\_scaled=[1.6,\ 3.2,\ 0.8,\ 6.4]
+$$
+
+Since variance scales with the **square of the scaling factor**, the new vector has $\( 8^2 = 64 \)$ times the original variance. Now, applying softmax to this scaled vector would result in something like:
+
+```py
+y_scaled = y * 8
+s_scaled = softmax(y_scaled)
+
+print("Softmax of y_scaled:", np.round(s_scaled, 3))
+```
+
+Output:
+
+```text
+Softmax of y_scaled: [0.008 0.039 0.004 0.95]
+```
+
+Clearly, the output becomes extremely **peaked**, with one value dominating. But why does this "peaking" matter so much? To understand the issue, we must look at how softmax behaves during backpropagation, where we compute its derivatives.
+
+Now, when we compute gradients during backpropagation, we rely on the derivative of the softmax function with respect to its input vector (pre-softmax scores). This derivative is captured by a **Jacobian matrix**:
 
 $$
-s=[0.004,\ 0.054,\ 0.001,\ 0.941]
+J =
+\begin{bmatrix}
+s_1 (1 - s_1) & -s_1 s_2 & -s_1 s_3 & -s_1 s_4 \\
+-s_2 s_1 & s_2 (1 - s_2) & -s_2 s_3 & -s_2 s_4 \\
+-s_3 s_1 & -s_3 s_2 & s_3 (1 - s_3) & -s_3 s_4 \\
+-s_4 s_1 & -s_4 s_2 & -s_4 s_3 & s_4 (1 - s_4)
+\end{bmatrix}
 $$
-
-Clearly, the output becomes extremely **peaked**, with one value dominating.
-
-Now, when we compute gradients during backpropagation, we rely on the derivative of the softmax function. This derivative is captured by a **Jacobian matrix**:
 
 - For $i = j$: $\text{softmax}' = s_i(1 - s_i)$  
 - For $i \ne j$: $\text{softmax}' = -s_i s_j$
 
-In highly skewed distributions, most $s_i$ values are close to 0, so their derivatives become **very small**.
+Now, this Jacobian matrix can also be written more compactly using a small manipulation, as the **difference between a diagonal matrix of softmax values** and the **outer product** of the softmax vector with itself:
+
+$$
+J = \begin{bmatrix}
+s_1 & 0 & 0 & 0 \\
+0 & s_2 & 0 & 0 \\
+0 & 0 & s_3 & 0 \\
+0 & 0 & 0 & s_4
+\end{bmatrix}
+ -
+\begin{bmatrix}
+s_1 s_1 & s_1 s_2 & s_1 s_3 & s_1 s_4 \\
+s_2 s_1 & s_2 s_2 & s_2 s_3 & s_2 s_4 \\
+s_3 s_1 & s_3 s_2 & s_3 s_3 & s_3 s_4 \\
+s_4 s_1 & s_4 s_2 & s_4 s_3 & s_4 s_4
+\end{bmatrix}
+$$
+
+
+This entire operation can be compactly written as - $\text{softmax}' = \text{diag}(\vec{s}) - \vec{s} \vec{s}^T$
+
+
+In highly skewed distributions, most $s_i$ values are close to 0, so their derivatives become **very small**. This can be seen for our toy example.
+
+```py
+def softmax_derivative(vec):
+    return np.diag(vec) - vec.reshape(-1, 1) @ vec.reshape(1, -1)
+
+J = softmax_derivative(s)
+J_scaled = softmax_derivative(s_scaled)
+
+print("Jacobian of softmax(y):")
+print(J)
+
+print("\nJacobian of softmax(y * 8):")
+print(J_scaled)
+```
+
+**Output:**
+
+```text
+Jacobian of softmax(y):
+[[ 0.16125, -0.04988, -0.03695, -0.07441],
+[-0.04988,  0.1859 , -0.04513, -0.09089],
+[-0.03695, -0.04513,  0.14942, -0.06733],
+[-0.07441, -0.09089, -0.06733,  0.23264]]
+
+Jacobian of softmax(y * 8):
+[[ 0.00776, -0.0003 , -0.00003, -0.00743],
+[-0.0003 ,  0.03722, -0.00014, -0.03678],
+[-0.00003, -0.00014,  0.0035 , -0.00334],
+[-0.00743, -0.03678, -0.00334,  0.04755]]
+```
 
 This leads to **vanishing gradients**, meaning the model’s parameters update very little (or not at all). As a result, **learning slows down dramatically or fails altogether**.
 
