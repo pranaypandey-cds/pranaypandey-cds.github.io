@@ -8,6 +8,7 @@ tags: [Transformer, Attention]
 comments: false
 math: true
 mermaid: false
+pin: true
 ---
 ![Scaled Attention with Sherlock Holmes](/assets/img/why_scale_the_scaled_attention.png){: width="800" }
 _Figure: Created with GPT._
