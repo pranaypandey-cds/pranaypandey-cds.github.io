@@ -4,7 +4,7 @@ description: Dissecting the Lies and Guarantees
 author: pranay
 date: 2025-07-11
 categories: [Blogging,Foundation]
-tags: [bloom-filter, probabilistic, hashing]
+tags: [bloom-filter, data-structures, hashing]
 comments: true
 math: true
 mermaid: false
